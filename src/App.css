@@ -1,0 +1,49 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+
+.header {
+  background-color: #20232a;
+  color: white;
+  padding: 20px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
+.header a {
+  color: white;
+  text-decoration: none;
+}
+
+
+.home {
+  flex: 1;
+  text-align: center;
+  padding: 80px 20px;
+}
+
+
+.home button {
+  background-color: #646cff;
+  color: white;
+
+  border: none;
+  padding: 12px 25px;
+
+  border-radius: 5px;
+}
+
+
+.footer {
+  background-color: #20232a;
+  color: white;
+
+  text-align: center;
+  padding: 20px;
+}
