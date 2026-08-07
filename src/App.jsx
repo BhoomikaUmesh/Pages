@@ -1,35 +1,22 @@
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import Home from "./pages/Home";
+import About from "./pages/About";
 import "./App.css";
+
 
 function Header() {
   return (
     <header className="header">
+
       <h2>My Website</h2>
 
       <nav>
-        <a href="#home">Home</a>
+        <Link to="/">Home</Link>
+        {" | "}
+        <Link to="/about">About</Link>
       </nav>
+
     </header>
-  );
-}
-
-
-function Home() {
-  return (
-    <section id="home" className="home">
-
-      <h1>
-        Welcome to My Single Page Application
-      </h1>
-
-      <p>
-        This is a React application deployed using GitHub Pages.
-      </p>
-
-      <button>
-        Learn More
-      </button>
-
-    </section>
   );
 }
 
@@ -37,21 +24,30 @@ function Home() {
 function Footer() {
   return (
     <footer className="footer">
-      <p>
-        © 2026 Bhoomika Umesh
-      </p>
+      <p>© 2026 Bhoomika Umesh</p>
     </footer>
   );
 }
 
 
 function App() {
+
   return (
-    <div className="app">
+    <BrowserRouter>
+
       <Header />
-      <Home />
+
+      <Routes>
+
+        <Route path="/" element={<Home />} />
+
+        <Route path="/about" element={<About />} />
+
+      </Routes>
+
       <Footer />
-    </div>
+
+    </BrowserRouter>
   );
 }
 
