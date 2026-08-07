@@ -33,7 +33,7 @@ function Footer() {
 function App() {
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/Pages">
 
       <Header />
 
