@@ -1,34 +1,50 @@
+
 import { useEffect, useState } from "react";
 
-const API_URL = "http://127.0.0.1:8000/api/comments/";
+const API_URL =
+  "https://pages-backend-9jsz.onrender.com/api/comments/";
 
 function Home() {
+  const [comments, setComments] = useState([]);
   const [name, setName] = useState("");
   const [comment, setComment] = useState("");
-  const [comments, setComments] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
-  // Get existing comments from Django
+  // Get comments from Django when the page loads
   useEffect(() => {
     fetch(API_URL)
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to fetch comments");
+        }
+
+        return response.json();
+      })
       .then((data) => {
+        console.log("Comments received:", data);
         setComments(data);
+        setLoading(false);
       })
       .catch((error) => {
-        console.error("Error loading comments:", error);
+        console.error("GET error:", error);
+        setError("Could not load comments.");
+        setLoading(false);
       });
   }, []);
 
-  // Send a new comment to Django
-  async function handleSubmit(event) {
+  // Submit a new comment
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     if (!name.trim() || !comment.trim()) {
+      setError("Please enter your name and comment.");
       return;
     }
 
-    setLoading(true);
+    setSubmitting(true);
+    setError("");
 
     try {
       const response = await fetch(API_URL, {
@@ -37,30 +53,35 @@ function Home() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name: name,
-          comment: comment,
+          name: name.trim(),
+          comment: comment.trim(),
         }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to create comment");
-      }
-
       const newComment = await response.json();
 
+      console.log("POST response:", response.status, newComment);
+
+      if (!response.ok) {
+        throw new Error(JSON.stringify(newComment));
+      }
+
+      // Add the new comment to the list immediately
       setComments((currentComments) => [
-        newComment,
         ...currentComments,
+        newComment,
       ]);
 
+      // Clear the form
       setName("");
       setComment("");
     } catch (error) {
-      console.error("Error creating comment:", error);
+      console.error("POST error:", error);
+      setError("Could not submit your comment.");
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
-  }
+  };
 
   return (
     <div>
@@ -74,59 +95,68 @@ function Home() {
 
       <form onSubmit={handleSubmit}>
         <div>
-          <label>
-            Name:
-            <br />
-            <input
-              type="text"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              placeholder="Your name"
-            />
-          </label>
+          <label htmlFor="name">Name</label>
+          <br />
+
+          <input
+            id="name"
+            type="text"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            placeholder="Your name"
+          />
         </div>
 
         <br />
 
         <div>
-          <label>
-            Comment:
-            <br />
-            <textarea
-              value={comment}
-              onChange={(event) => setComment(event.target.value)}
-              placeholder="Your comment"
-              rows="4"
-              cols="40"
-            />
-          </label>
+          <label htmlFor="comment">Comment</label>
+          <br />
+
+          <textarea
+            id="comment"
+            value={comment}
+            onChange={(event) => setComment(event.target.value)}
+            placeholder="Write a comment"
+            rows="4"
+          />
         </div>
 
         <br />
 
-        <button type="submit" disabled={loading}>
-          {loading ? "Submitting..." : "Submit"}
+        <button type="submit" disabled={submitting}>
+          {submitting ? "Submitting..." : "Submit Comment"}
         </button>
       </form>
+
+      {error && <p style={{ color: "red" }}>{error}</p>}
 
       <hr />
 
       <h2>Comments</h2>
 
-      {comments.length === 0 ? (
+      {loading ? (
+        <p>Loading comments...</p>
+      ) : comments.length === 0 ? (
         <p>No comments yet.</p>
       ) : (
         comments.map((item) => (
           <div key={item.id}>
             <strong>{item.name}</strong>
+
             <p>{item.comment}</p>
+
             <small>{item.created_at}</small>
+
             <hr />
           </div>
         ))
       )}
+
+      <footer>© 2026 Bhoomika Umesh</footer>
     </div>
   );
 }
 
 export default Home;
+
